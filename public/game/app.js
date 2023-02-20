@@ -10,8 +10,15 @@ const manCharacterSheet = {}
 const animationSpeed = 0.2
 let player 
 const playerScale = 4
-const manSpeed = 3
+const manSpeed = 3.2
 const pressedKeys = []
+
+// define footstep sound
+const footstepSound = new Howl({
+    src: ['./sounds/footsteps.mp3'],
+    loop: true,
+    volume: 1.5,
+});
 
 const scenes = {
     'bedroom': {
@@ -77,6 +84,7 @@ function play() {
     let sound = new Howl({
         src: ['./sounds/crickets.mp3'],
         loop: true,
+        volume: 0.5,
     });
     sound.play()
 
@@ -177,8 +185,6 @@ function move(deltaTime) {
 
         return [x, y]
     }
-    
-    const [movementX, movementY] = getMovementVector()
 
     const doAnimations = () => {
         if (movementX == 0 && movementY == 0) {
@@ -187,7 +193,6 @@ function move(deltaTime) {
             changeAnimationState(player, manCharacterSheet['walking'])
         }
 
-        console.log(player.scale.x)
         if (movementX > 0) {
             player.scale.x = playerScale
         } else if (movementX < 0) {
@@ -195,29 +200,40 @@ function move(deltaTime) {
         }
     }
 
-    doAnimations()
-
-    const doMoving = () => {
+    const doMoving = (x, y) => {
         const speed = manSpeed * deltaTime 
 
         if (pressedKeys.includes(87)) {
-            player.y -= (speed * movementY)
+            player.y -= (speed * y)
         }
 
         if (pressedKeys.includes(83)) {
-            player.y -= (speed * movementY)
+            player.y -= (speed * y)
         }
 
         if (pressedKeys.includes(65)) {
-            player.x += (speed * movementX)
+            player.x += (speed * x)
         }
 
         if (pressedKeys.includes(68)) {
-            player.x += (speed * movementX)
+            player.x += (speed * x)
         }
     }
 
-    doMoving()
+    const playFootsteps = (x, y) => {
+        if (movementX != 0 || movementY != 0) {
+            if (footstepSound.playing() == false) {
+                footstepSound.play()
+            }
+        } else {
+            footstepSound.stop()
+        }
+    }
+    
+    const [movementX, movementY] = getMovementVector()
+    playFootsteps()
+    doAnimations()
+    doMoving(movementX, movementY)
 }
 
 function update(deltaTime) {
