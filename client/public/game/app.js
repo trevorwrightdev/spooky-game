@@ -15,9 +15,9 @@ const pressedKeys = []
 const animationSpeed = 0.2
 const playerScale = 4
 const manSpeed = 3.2
-const showAllColliders = true
 const horizontalPadding = 30
 const topPadding = 30
+const showAllColliders = false
 // * -------------------------->
 
 // define footstep sound
@@ -25,7 +25,7 @@ const footstepSound = new Howl({
     src: ['./sounds/footsteps.mp3'],
     loop: true,
     volume: 1.5,
-});
+})
 
 const scenes = {
     bedroom: {
@@ -35,9 +35,17 @@ const scenes = {
         ],
         colliders: [
             {x: 0, y: 0, width: 190, height: 350},
+            {x: 0, y: 0, width: 850, height: 110},
         ]
     }
 }
+
+const borderColliders = [
+    {x: 0, y: 0, width: 7, height: 480},
+    {x: 0, y: 473, width: 854, height: 7},
+    {x: 847, y: 0, width: 7, height: 480},
+    {x: 0, y: 0, width: 854, height: 7},
+]
 
 const app = new PIXI.Application({
     width: width,
@@ -124,7 +132,9 @@ function loadScene(sceneName, spawnPointIndex) {
 
     // add visual colliders 
     if (showAllColliders == true) {
-        for (let col of scenes[sceneName]['colliders']) {
+        const allColliders = [...scenes[sceneName]['colliders'], ...borderColliders]
+
+        for (let col of allColliders) {
             const collider = new PIXI.Graphics()
             collider.beginFill(0x00FF00)
             collider.alpha = 0.5
@@ -254,7 +264,9 @@ function move(deltaTime) {
         }
 
         // check if we are colliding with any colliders
-        for (let col of scenes[currentScene]['colliders']) {
+        const allColliders = [...scenes[currentScene]['colliders'], ...borderColliders]
+
+        for (let col of allColliders) {
             const xMin = col.x
             const xMax = col.x + col.width
             const yMin = col.y
