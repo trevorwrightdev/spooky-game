@@ -233,21 +233,39 @@ function changeAnimationState(objectToChange, newState) {
 
 function move(deltaTime) {
 
+    const speed = manSpeed * deltaTime 
+
     const getMovementVector = () => {
         let x = 0
         let y = 0
 
         if (pressedKeys.includes(87)) {
-            y += 1
+            if (pointIsInCollider({x: player.x, y: player.y - speed}) == false) {
+                y += 1
+            } else {
+                y = 0
+            }
         } 
         if (pressedKeys.includes(83)) {
-            y -= 1
+            if (pointIsInCollider({x: player.x, y: player.y + speed}) == false) {
+                y -= 1
+            } else {
+                y = 0
+            }
         }
         if (pressedKeys.includes(65)) {
-            x -= 1
+            if (pointIsInCollider({x: player.x - speed, y: player.y}) == false) {
+                x -= 1
+            } else {
+                x = 0
+            }
         }
         if (pressedKeys.includes(68)) {
-            x += 1
+            if (pointIsInCollider({x: player.x + speed, y: player.y}) == false) {
+                x += 1
+            } else {
+                x = 0
+            }
         }
 
         const length = Math.sqrt(x**2+y**2)
@@ -261,6 +279,20 @@ function move(deltaTime) {
         }
 
         return [x, y]
+    }
+
+    function pointIsInCollider(point) {
+        const allColliders = [...scenes[currentScene]['colliders'], ...borderColliders]
+
+        for (let collider of allColliders) {
+            if ((point.x + horizontalPadding) > collider.x && (point.x - horizontalPadding) < collider.x + collider.width) {
+                if (point.y > collider.y && (point.y - topPadding) < collider.y + collider.height) {
+                    return true
+                }
+            }
+        }
+
+        return false
     }
 
     const doAnimations = () => {
@@ -278,7 +310,6 @@ function move(deltaTime) {
     }
 
     const doMoving = (x, y) => {
-        const speed = manSpeed * deltaTime 
         const newPosition = {
             x: player.x,
             y: player.y,
@@ -301,21 +332,7 @@ function move(deltaTime) {
         }
 
         // check if we are colliding with any colliders
-        const allColliders = [...scenes[currentScene]['colliders'], ...borderColliders]
-
-        for (let col of allColliders) {
-            const xMin = col.x
-            const xMax = col.x + col.width
-            const yMin = col.y
-            const yMax = col.y + col.height
-
-            if (
-                (newPosition.x > (xMin - horizontalPadding) && newPosition.x < (xMax + horizontalPadding)) &&
-                (newPosition.y > yMin && newPosition.y < (yMax + topPadding))
-            ) {
-                return
-            }
-        }
+        // if (pointIsInCollider(newPosition)) return 
 
         player.x = newPosition.x
         player.y = newPosition.y
