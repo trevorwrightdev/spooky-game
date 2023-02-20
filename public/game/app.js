@@ -9,6 +9,12 @@ let assets
 const manCharacterSheet = {}
 const animationSpeed = 0.2
 
+const scenes = {
+    'bedroom': {
+        'background': 'bedroom',
+    }
+}
+
 const app = new PIXI.Application({
     width: width,
     height: height,
@@ -38,6 +44,11 @@ function addPlayerToScene() {
     character.animationSpeed = animationSpeed
     character.loop = true
     character.play()
+
+    // increase character size 
+    character.width = 128
+    character.height = 128
+
     app.stage.addChild(character)
 }
 
@@ -54,13 +65,19 @@ function play() {
     });
     sound.play()
 
+    // start game loop
+    app.ticker.add(update)
+
     // load bedroom if we are the normal guy 
-    loadBedroom()
+    loadScene('bedroom')
 }
 
-function loadBedroom() {
+function loadScene(sceneName) {
+    // remove all children from stage
+    app.stage.removeChildren()
+
     // load background
-    const background = new PIXI.Sprite(assets['bedroom'])
+    const background = new PIXI.Sprite(assets[scenes[sceneName]['background']])
     background.width = width
     background.height = height
     app.stage.addChild(background)
@@ -83,6 +100,10 @@ function loadMainMenu() {
     playButton.addEventListener('click', play)
 
     document.body.appendChild(playButton)
+}
+
+function update(deltaTime) {
+    
 }
 
 // this function runs on page load
