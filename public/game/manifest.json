@@ -6,6 +6,10 @@
                 {
                     "name": "man",
                     "srcs": "./sprites/character-sheet.png"
+                },
+                {
+                    "name": "bedroom",
+                    "srcs": "./sprites/bedroom.png"
                 }
             ]
         }
