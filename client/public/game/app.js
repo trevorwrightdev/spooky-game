@@ -41,6 +41,7 @@ const scenes = {
         colliders: [
             {x: 0, y: 0, width: 190, height: 350},
             {x: 0, y: 0, width: 850, height: 110},
+            {x: 420, y: 0, width: 115, height: 245},
         ],
         doors: [
             {x: 790, y: 240, scene: 'hallway', spawnPointIndex: 0},
