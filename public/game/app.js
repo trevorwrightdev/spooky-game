@@ -9,6 +9,7 @@ let assets
 const manCharacterSheet = {}
 const animationSpeed = 0.2
 let player 
+const playerScale = 4
 const manSpeed = 3
 const pressedKeys = []
 
@@ -39,6 +40,15 @@ function cutSpriteSheets() {
     ]
 
     manCharacterSheet['idle'] = manIdle
+
+    const manWalking = [
+        new PIXI.Texture(manSprite, new PIXI.Rectangle(0, 0, w, h)),
+        new PIXI.Texture(manSprite, new PIXI.Rectangle(w, 0, w, h)),
+        new PIXI.Texture(manSprite, new PIXI.Rectangle(w*2, 0, w, h)),
+        new PIXI.Texture(manSprite, new PIXI.Rectangle(w*3, 0, w, h)),
+    ]
+
+    manCharacterSheet['walking'] = manWalking
 }
 
 function addPlayerToScene() {
@@ -49,8 +59,8 @@ function addPlayerToScene() {
     character.play()
 
     // increase character size 
-    character.width = 128
-    character.height = 128
+    character.scale.x = playerScale
+    character.scale.y = playerScale
 
     player = character
 
@@ -93,6 +103,12 @@ function loadScene(sceneName) {
 
     // add player to scene
     addPlayerToScene()
+
+    // add lighting
+    const light = new PIXI.Sprite(assets['lighting'])
+    light.width = width
+    light.height = height
+    app.stage.addChild(light)
 }
 
 function loadMainMenu() {
@@ -123,53 +139,85 @@ function keysDown(e) {
     }
 }
 
+function changeAnimationState(objectToChange, newState) {
+    if (objectToChange.textures != newState) {
+        objectToChange.textures = newState
+        objectToChange.play()
+    }
+}
+
 function move(deltaTime) {
-    let x = 0
-    let y = 0
 
-    if (pressedKeys.includes(87)) {
-        y += 1
-    } 
-    if (pressedKeys.includes(83)) {
-        y -= 1
+    const getMovementVector = () => {
+        let x = 0
+        let y = 0
+
+        if (pressedKeys.includes(87)) {
+            y += 1
+        } 
+        if (pressedKeys.includes(83)) {
+            y -= 1
+        }
+        if (pressedKeys.includes(65)) {
+            x -= 1
+        }
+        if (pressedKeys.includes(68)) {
+            x += 1
+        }
+
+        const length = Math.sqrt(x**2+y**2)
+        //Then divide the x and y by the length.
+        // we only wanna do this if x and y arent 0 
+        if (x != 0) {
+            x = x / length;
+        }
+        if (y != 0) {
+            y = y / length;
+        }
+
+        return [x, y]
     }
-    if (pressedKeys.includes(65)) {
-        x -= 1
-    }
-    if (pressedKeys.includes(68)) {
-        x += 1
-    }
-    const length = Math.sqrt(x**2+y**2)
-    //Then divide the x and y by the length.
-    // we only wanna do this if x and y arent 0 
-    if (x != 0) {
-        x = x / length;
-    }
-    if (y != 0) {
-        y = y / length;
+    
+    const [movementX, movementY] = getMovementVector()
+
+    const doAnimations = () => {
+        if (movementX == 0 && movementY == 0) {
+            changeAnimationState(player, manCharacterSheet['idle'])
+        } else {
+            changeAnimationState(player, manCharacterSheet['walking'])
+        }
+
+        console.log(player.scale.x)
+        if (movementX > 0) {
+            player.scale.x = playerScale
+        } else if (movementX < 0) {
+            player.scale.x = -playerScale
+        }
     }
 
-    let movementX = x
-    let movementY = y
-    console.log(movementX, movementY)
+    doAnimations()
 
-    const speed = manSpeed * deltaTime 
+    const doMoving = () => {
+        const speed = manSpeed * deltaTime 
 
-    if (pressedKeys.includes(87)) {
-        player.y -= (speed * movementY)
+        if (pressedKeys.includes(87)) {
+            player.y -= (speed * movementY)
+        }
+
+        if (pressedKeys.includes(83)) {
+            player.y -= (speed * movementY)
+        }
+
+        if (pressedKeys.includes(65)) {
+            player.x += (speed * movementX)
+        }
+
+        if (pressedKeys.includes(68)) {
+            player.x += (speed * movementX)
+        }
     }
 
-    if (pressedKeys.includes(83)) {
-        player.y -= (speed * movementY)
-    }
-
-    if (pressedKeys.includes(65)) {
-        player.x += (speed * movementX)
-    }
-
-    if (pressedKeys.includes(68)) {
-        player.x += (speed * movementX)
-    }
+    doMoving()
 }
 
 function update(deltaTime) {
