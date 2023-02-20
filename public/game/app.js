@@ -8,7 +8,8 @@ const height = 480
 let assets
 const manCharacterSheet = {}
 const animationSpeed = 0.2
-
+let player 
+const manSpeed = 3
 const pressedKeys = []
 
 const scenes = {
@@ -50,6 +51,8 @@ function addPlayerToScene() {
     // increase character size 
     character.width = 128
     character.height = 128
+
+    player = character
 
     app.stage.addChild(character)
 }
@@ -120,12 +123,57 @@ function keysDown(e) {
     }
 }
 
-function getKeyboardInput() {
+function move(deltaTime) {
+    let x = 0
+    let y = 0
 
+    if (pressedKeys.includes(87)) {
+        y += 1
+    } 
+    if (pressedKeys.includes(83)) {
+        y -= 1
+    }
+    if (pressedKeys.includes(65)) {
+        x -= 1
+    }
+    if (pressedKeys.includes(68)) {
+        x += 1
+    }
+    const length = Math.sqrt(x**2+y**2)
+    //Then divide the x and y by the length.
+    // we only wanna do this if x and y arent 0 
+    if (x != 0) {
+        x = x / length;
+    }
+    if (y != 0) {
+        y = y / length;
+    }
+
+    let movementX = x
+    let movementY = y
+    console.log(movementX, movementY)
+
+    const speed = manSpeed * deltaTime 
+
+    if (pressedKeys.includes(87)) {
+        player.y -= (speed * movementY)
+    }
+
+    if (pressedKeys.includes(83)) {
+        player.y -= (speed * movementY)
+    }
+
+    if (pressedKeys.includes(65)) {
+        player.x += (speed * movementX)
+    }
+
+    if (pressedKeys.includes(68)) {
+        player.x += (speed * movementX)
+    }
 }
 
 function update(deltaTime) {
-    console.log(pressedKeys)
+    move(deltaTime)
 }
 
 // this function runs on page load
