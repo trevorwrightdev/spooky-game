@@ -6,14 +6,19 @@ const width = 854
 const height = 480
 
 let assets
+let currentScene = ''
 const manCharacterSheet = {}
-const animationSpeed = 0.2
 let player 
+const pressedKeys = []
+
+// * CONFIGURATION ------------>
+const animationSpeed = 0.2
 const playerScale = 4
 const manSpeed = 3.2
-const pressedKeys = []
-let currentScene = ''
 const showAllColliders = true
+const horizontalPadding = 30
+const topPadding = 30
+// * -------------------------->
 
 // define footstep sound
 const footstepSound = new Howl({
@@ -26,7 +31,7 @@ const scenes = {
     bedroom: {
         background: 'bedroom',
         spawnPoints: [
-            {x: 236, y: 131},
+            {x: 236, y: 250},
         ],
         colliders: [
             {x: 0, y: 0, width: 190, height: 350},
@@ -68,7 +73,7 @@ function cutSpriteSheets() {
 
 function addPlayerToScene() {
     const character = new PIXI.AnimatedSprite(manCharacterSheet['idle'])
-    character.anchor.set(0.5, 0)
+    character.anchor.set(0.5, 1)
     character.animationSpeed = animationSpeed
     character.loop = true
     character.play()
@@ -227,22 +232,44 @@ function move(deltaTime) {
 
     const doMoving = (x, y) => {
         const speed = manSpeed * deltaTime 
+        const newPosition = {
+            x: player.x,
+            y: player.y,
+        }
 
         if (pressedKeys.includes(87)) {
-            player.y -= (speed * y)
+            newPosition.y -= (speed * y)
         }
 
         if (pressedKeys.includes(83)) {
-            player.y -= (speed * y)
+            newPosition.y -= (speed * y)
         }
 
         if (pressedKeys.includes(65)) {
-            player.x += (speed * x)
+            newPosition.x += (speed * x)
         }
 
         if (pressedKeys.includes(68)) {
-            player.x += (speed * x)
+            newPosition.x += (speed * x)
         }
+
+        // check if we are colliding with any colliders
+        for (let col of scenes[currentScene]['colliders']) {
+            const xMin = col.x
+            const xMax = col.x + col.width
+            const yMin = col.y
+            const yMax = col.y + col.height
+
+            if (
+                (newPosition.x > (xMin - horizontalPadding) && newPosition.x < (xMax + horizontalPadding)) &&
+                (newPosition.y > yMin && newPosition.y < (yMax + topPadding))
+            ) {
+                return
+            }
+        }
+
+        player.x = newPosition.x
+        player.y = newPosition.y
     }
 
     const playFootsteps = (x, y) => {
