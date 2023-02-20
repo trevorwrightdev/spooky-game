@@ -17,7 +17,7 @@ const animationSpeed = 0.2
 const playerScale = 4
 const manSpeed = 3.2
 const horizontalPadding = 30
-const topPadding = 30
+const topPadding = 15
 const doorZoneWidth = 60
 const doorZoneHeight = 100
 const doorTutorialText = 'Press E to enter'
@@ -61,6 +61,8 @@ const app = new PIXI.Application({
     height: height,
     backgroundColor: 0xFFFFFF,
 })
+
+// app.stage.filters = [new PIXI.filters.CRTFilter()]
 
 async function loadAllAssets() {
     await PIXI.Assets.init({manifest: "./manifest.json"})
@@ -239,28 +241,28 @@ function move(deltaTime) {
         let x = 0
         let y = 0
 
-        if (pressedKeys.includes(87)) {
+        if (pressedKeys.includes(87) || pressedKeys.includes(38)) {
             if (pointIsInCollider({x: player.x, y: player.y - speed}) == false) {
                 y += 1
             } else {
                 y = 0
             }
         } 
-        if (pressedKeys.includes(83)) {
+        if (pressedKeys.includes(83) || pressedKeys.includes(40)) {
             if (pointIsInCollider({x: player.x, y: player.y + speed}) == false) {
                 y -= 1
             } else {
                 y = 0
             }
         }
-        if (pressedKeys.includes(65)) {
+        if (pressedKeys.includes(65) || pressedKeys.includes(37)) {
             if (pointIsInCollider({x: player.x - speed, y: player.y}) == false) {
                 x -= 1
             } else {
                 x = 0
             }
         }
-        if (pressedKeys.includes(68)) {
+        if (pressedKeys.includes(68) || pressedKeys.includes(39)) {
             if (pointIsInCollider({x: player.x + speed, y: player.y}) == false) {
                 x += 1
             } else {
@@ -315,24 +317,8 @@ function move(deltaTime) {
             y: player.y,
         }
 
-        if (pressedKeys.includes(87)) {
-            newPosition.y -= (speed * y)
-        }
-
-        if (pressedKeys.includes(83)) {
-            newPosition.y -= (speed * y)
-        }
-
-        if (pressedKeys.includes(65)) {
-            newPosition.x += (speed * x)
-        }
-
-        if (pressedKeys.includes(68)) {
-            newPosition.x += (speed * x)
-        }
-
-        // check if we are colliding with any colliders
-        // if (pointIsInCollider(newPosition)) return 
+        newPosition.y -= (speed * y)
+        newPosition.x += (speed * x)
 
         player.x = newPosition.x
         player.y = newPosition.y
