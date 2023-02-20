@@ -5,16 +5,40 @@ PIXI.BaseTexture.defaultOptions.scaleMode = PIXI.SCALE_MODES.NEAREST
 const width = 640
 const height = 480
 
+let assets
+const manCharacterSheet = {}
+const animationSpeed = 0.2
+
 const app = new PIXI.Application({
     width: width,
     height: height,
     backgroundColor: 0xFFFFFF,
 })
 
-let assets
 async function loadAllAssets() {
     await PIXI.Assets.init({manifest: "./manifest.json"})
     assets = await PIXI.Assets.loadBundle("assets")
+}
+
+function cutSpriteSheets() {
+    const manSprite = assets['man']
+    const w = 32
+    const h = 32
+
+    const manIdle = [
+        new PIXI.Texture(manSprite, new PIXI.Rectangle(w, 0, w, h))
+    ]
+
+    manCharacterSheet['idle'] = manIdle
+}
+
+function addPlayerToScene() {
+    const character = new PIXI.AnimatedSprite(manCharacterSheet['idle'])
+    character.anchor.set(0.5, 0)
+    character.animationSpeed = animationSpeed
+    character.loop = true
+    character.play()
+    app.stage.addChild(character)
 }
 
 function play() {
@@ -29,6 +53,8 @@ function play() {
         loop: true,
     });
     sound.play()
+
+    // load bedroom if we are the normal guy 
     loadBedroom()
 }
 
@@ -38,6 +64,9 @@ function loadBedroom() {
     background.width = width
     background.height = height
     app.stage.addChild(background)
+
+    // add player to scene
+    addPlayerToScene()
 }
 
 function loadMainMenu() {
@@ -60,6 +89,8 @@ function loadMainMenu() {
 async function setUpGame() {
     // load all of our assets before we do anything 
     await loadAllAssets()
+    // cut up sprite sheets
+    cutSpriteSheets()
     // set up our main menu
     loadMainMenu()
 }
