@@ -2,7 +2,7 @@ PIXI.settings.RESOLUTION = 5
 
 PIXI.BaseTexture.defaultOptions.scaleMode = PIXI.SCALE_MODES.NEAREST
 
-const width = 640
+const width = 854
 const height = 480
 
 let assets
@@ -12,6 +12,7 @@ let player
 const playerScale = 4
 const manSpeed = 3.2
 const pressedKeys = []
+let currentScene = ''
 
 // define footstep sound
 const footstepSound = new Howl({
@@ -21,8 +22,11 @@ const footstepSound = new Howl({
 });
 
 const scenes = {
-    'bedroom': {
-        'background': 'bedroom',
+    bedroom: {
+        background: 'bedroom',
+        spawnPoints: [
+            {x: 236, y: 131},
+        ],
     }
 }
 
@@ -96,10 +100,10 @@ function play() {
     window.addEventListener('keyup', keysUp)
 
     // load bedroom if we are the normal guy 
-    loadScene('bedroom')
+    loadScene('bedroom', 0)
 }
 
-function loadScene(sceneName) {
+function loadScene(sceneName, spawnPointIndex) {
     // remove all children from stage
     app.stage.removeChildren()
 
@@ -111,6 +115,9 @@ function loadScene(sceneName) {
 
     // add player to scene
     addPlayerToScene()
+    const spawnPoint = scenes[sceneName]['spawnPoints'][spawnPointIndex]
+    player.x = spawnPoint.x
+    player.y = spawnPoint.y
 
     // add lighting
     const light = new PIXI.Sprite(assets['lighting'])
