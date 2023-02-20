@@ -9,6 +9,8 @@ let assets
 const manCharacterSheet = {}
 const animationSpeed = 0.2
 
+const pressedKeys = []
+
 const scenes = {
     'bedroom': {
         'background': 'bedroom',
@@ -68,6 +70,10 @@ function play() {
     // start game loop
     app.ticker.add(update)
 
+    // listen to events
+    window.addEventListener('keydown', keysDown)
+    window.addEventListener('keyup', keysUp)
+
     // load bedroom if we are the normal guy 
     loadScene('bedroom')
 }
@@ -102,8 +108,24 @@ function loadMainMenu() {
     document.body.appendChild(playButton)
 }
 
+function keysUp(e) {
+    if (pressedKeys.length != 0) {
+        pressedKeys.splice(pressedKeys.indexOf(e.keyCode), 1)
+    }
+}
+
+function keysDown(e) {
+    if (pressedKeys.includes(e.keyCode) == false) {
+        pressedKeys.push(e.keyCode)
+    }
+}
+
+function getKeyboardInput() {
+
+}
+
 function update(deltaTime) {
-    
+    console.log(pressedKeys)
 }
 
 // this function runs on page load
