@@ -16,5 +16,19 @@ const app = new PIXI.Application({
     backgroundColor: 0xFFFFFF,
 })
 
-document.body.appendChild(app.view)
+let assets
+async function loadAllAssets() {
+    await PIXI.Assets.init({manifest: "./manifest.json"})
+    assets = await PIXI.Assets.loadBundle("assets")
+}
+
+// this function runs on start.
+async function startGame() {
+    
+    // load all of our assets before we do anything 
+    await loadAllAssets()
+    document.body.appendChild(app.view)
+}
+
+startGame()
 

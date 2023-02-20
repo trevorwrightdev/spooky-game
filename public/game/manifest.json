@@ -1,0 +1,13 @@
+{
+    "bundles": [
+        {
+            "name": "assets",
+            "assets": [
+                {
+                    "name": "man",
+                    "srcs": "./sprites/character-sheet.png"
+                }
+            ]
+        }
+    ]
+}
