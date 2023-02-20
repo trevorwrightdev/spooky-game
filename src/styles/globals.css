@@ -6,4 +6,5 @@
 
 html {
   background: black;
+  overflow: hidden;
 }
