@@ -13,6 +13,7 @@ const playerScale = 4
 const manSpeed = 3.2
 const pressedKeys = []
 let currentScene = ''
+const showAllColliders = true
 
 // define footstep sound
 const footstepSound = new Howl({
@@ -27,6 +28,9 @@ const scenes = {
         spawnPoints: [
             {x: 236, y: 131},
         ],
+        colliders: [
+            {x: 0, y: 0, width: 190, height: 350},
+        ]
     }
 }
 
@@ -113,6 +117,18 @@ function loadScene(sceneName, spawnPointIndex) {
     background.height = height
     app.stage.addChild(background)
 
+    // add visual colliders 
+    if (showAllColliders == true) {
+        for (let col of scenes[sceneName]['colliders']) {
+            const collider = new PIXI.Graphics()
+            collider.beginFill(0x00FF00)
+            collider.alpha = 0.5
+            collider.drawRect(col.x, col.y, col.width, col.height)
+            collider.endFill()
+            app.stage.addChild(collider)
+        }
+    }
+
     // add player to scene
     addPlayerToScene()
     const spawnPoint = scenes[sceneName]['spawnPoints'][spawnPointIndex]
@@ -124,6 +140,8 @@ function loadScene(sceneName, spawnPointIndex) {
     light.width = width
     light.height = height
     app.stage.addChild(light)
+
+    currentScene = sceneName
 }
 
 function loadMainMenu() {
