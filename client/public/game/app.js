@@ -9,6 +9,7 @@ let assets
 let currentScene = ''
 const manCharacterSheet = {}
 let player 
+let tutorialText
 const pressedKeys = []
 
 // * CONFIGURATION ------------>
@@ -17,7 +18,11 @@ const playerScale = 4
 const manSpeed = 3.2
 const horizontalPadding = 30
 const topPadding = 30
+const doorZoneWidth = 60
+const doorZoneHeight = 100
+const doorTutorialText = 'Press E to enter'
 const showAllColliders = false
+const showInteractables = false
 // * -------------------------->
 
 // define footstep sound
@@ -36,6 +41,9 @@ const scenes = {
         colliders: [
             {x: 0, y: 0, width: 190, height: 350},
             {x: 0, y: 0, width: 850, height: 110},
+        ],
+        doors: [
+            {x: 790, y: 240, scene: 'hallway', spawnPointIndex: 0},
         ]
     }
 }
@@ -95,6 +103,19 @@ function addPlayerToScene() {
     app.stage.addChild(character)
 }
 
+function addTutorialText() {
+    const text = new PIXI.Text('', {
+        fontFamily : 'VT323', 
+        fontSize: 32, 
+        fill : 0xFFFFFF, 
+    })
+
+    text.x = 30
+    text.y = 30
+    tutorialText = text
+    app.stage.addChild(text)
+}
+
 function play() {
     // remove all children from body
     document.body.innerHTML = ''
@@ -130,7 +151,7 @@ function loadScene(sceneName, spawnPointIndex) {
     background.height = height
     app.stage.addChild(background)
 
-    // add visual colliders 
+    // draw colliders 
     if (showAllColliders == true) {
         const allColliders = [...scenes[sceneName]['colliders'], ...borderColliders]
 
@@ -139,6 +160,18 @@ function loadScene(sceneName, spawnPointIndex) {
             collider.beginFill(0x00FF00)
             collider.alpha = 0.5
             collider.drawRect(col.x, col.y, col.width, col.height)
+            collider.endFill()
+            app.stage.addChild(collider)
+        }
+    }
+
+    // draw interactables
+    if (showInteractables == true) {
+        for (let door of scenes[sceneName]['doors']) {
+            const collider = new PIXI.Graphics()
+            collider.beginFill(0x0000FF)
+            collider.alpha = 0.5
+            collider.drawRect(door.x, door.y, doorZoneWidth, doorZoneHeight)
             collider.endFill()
             app.stage.addChild(collider)
         }
@@ -155,6 +188,9 @@ function loadScene(sceneName, spawnPointIndex) {
     light.width = width
     light.height = height
     app.stage.addChild(light)
+
+    // add tutorial text
+    addTutorialText()
 
     currentScene = sceneName
 }
@@ -300,8 +336,36 @@ function move(deltaTime) {
     doMoving(movementX, movementY)
 }
 
+function checkForInteractables() {
+    const playerX = player.x
+    const playerY = player.y
+
+    for (let door of scenes[currentScene]['doors']) {
+        const xMin = door.x
+        const xMax = door.x + doorZoneWidth
+        const yMin = door.y
+        const yMax = door.y + doorZoneHeight
+
+        if (
+            (playerX > xMin && playerX < xMax) &&
+            (playerY > yMin && playerY < yMax)
+        ) {
+            tutorialText.text = doorTutorialText
+            // if e is pressed
+            if (pressedKeys.includes(69)) {
+                loadScene(door.scene, door.spawnPointIndex)
+            }
+
+            return 
+        }
+    }
+
+    tutorialText.text = ''
+}
+
 function update(deltaTime) {
     move(deltaTime)
+    checkForInteractables()
 }
 
 // this function runs on page load
